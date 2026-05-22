@@ -383,7 +383,7 @@ class BambuClient:
 
         self._connected = False
         self._device_confirmed = False
-        self._port = 8883
+        self._port = 1883
         self._refreshed = False
         self._last_error_code = 0
 
@@ -448,7 +448,6 @@ class BambuClient:
 
     def setup_tls(self):
         if self._local_mqtt:
-            self.client.tls_set_context(self.local_tls_context)
             if self._disable_ssl_verify:
                 self.client.tls_insecure_set(True) 
         else:
@@ -695,11 +694,10 @@ class BambuClient:
                 self.client = None
 
 
-    def ftp_connection(self) -> ImplicitFTP_TLS:
-        ftp = ImplicitFTP_TLS(context=self.local_tls_context)
-        ftp.connect(host=self._device.info.ip_address, port=990, timeout=15)
+    def ftp_connection(self) -> ftplib.FTP:
+        ftp = ftplib.FTP()
+        ftp.connect(host=self._device.info.ip_address, port=21, timeout=15)
         ftp.login(user='bblp', passwd=self._access_code)
-        ftp.prot_p()
         return ftp
 
     async def try_connection(self):
